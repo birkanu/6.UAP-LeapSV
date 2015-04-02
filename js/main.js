@@ -46,6 +46,31 @@ $(document).ready(function(){
   		return radians * (180 / Math.PI);
 	}
 
+	function generateHyperlapse() {
+		console.log( "Generating route..." );
+		var marker;
+		while(_route_markers.length > 0) {
+			marker = _route_markers.pop();
+			marker.setMap(null);
+		}
+		request = {
+			origin: start_point, 
+			destination: end_point, 
+			travelMode: google.maps.DirectionsTravelMode.DRIVING
+		};
+		directions_service.route(request, function(response, status) {
+			if (status == google.maps.DirectionsStatus.OK) {
+		        var bounds = response.routes[0].bounds;
+		        map.fitBounds(bounds);
+		        map.setCenter(bounds.getCenter()); 
+		        directions_renderer.setDirections(response);  
+				hyperlapse.generate({route: response});
+			} else {
+				console.log(status);
+			}
+		})
+	}
+
 	var mapOpt = { 
 		center: start_point,
 		zoom: 13,
@@ -193,8 +218,8 @@ $(document).ready(function(){
 							leap_pitch = radiansToDegrees(smoothed_leap_pitch);
 							leap_yaw = radiansToDegrees(smoothed_leap_yaw);
 						} else {
-							var pitch = hand.pitch(); 
-							var yaw = hand.yaw();
+							var pitch = 0; 
+							var yaw = 0;
 							smoothedPitch = pitch; 
 							smoothedYaw = yaw;
 							leap_pitch = radiansToDegrees(pitch);
@@ -223,85 +248,5 @@ $(document).ready(function(){
 		camera_pin.setPosition(e.point.location);
 	};
 
-	/* Dat GUI */
-	var gui = new dat.GUI();
-
-	var o = {
-		distance_between_points:10, 
-		max_points:100, 
-		fov:80, 
-		elevation:Math.floor(_elevation), 
-		tilt:0, 
-		millis:90, 
-		offset_x:0,
-		offset_y:0,
-		offset_z:0,
-		position_x:0,
-		position_y:0,
-		screen_width: window.innerWidth,
-		screen_height: window.innerHeight,
-		generate: function() {
-			console.log( "Generating route..." );
-			var marker;
-			while(_route_markers.length > 0) {
-				marker = _route_markers.pop();
-				marker.setMap(null);
-			}
-			request = {
-				origin: start_point, 
-				destination: end_point, 
-				travelMode: google.maps.DirectionsTravelMode.DRIVING
-			};
-			directions_service.route(request, function(response, status) {
-				if (status == google.maps.DirectionsStatus.OK) {
-			        var bounds = response.routes[0].bounds;
-			        map.fitBounds(bounds);
-			        map.setCenter(bounds.getCenter()); 
-			        directions_renderer.setDirections(response);  
-					hyperlapse.generate({route: response});
-				} else {
-					console.log(status);
-				}
-			})
-		}
-	};
-
-	var scn = gui.addFolder('screen');
-	scn.add(o, 'screen_width', window.innerHeight).listen();
-	scn.add(o, 'screen_height', window.innerHeight).listen();
-
-	var parameters = gui.addFolder('parameters');
-
-	var millis_control = parameters.add(o, 'millis', 10, 250);
-	millis_control.onChange(function(value) {
-		hyperlapse.millis = value;
-	});
-
-	var position_x_control = parameters.add(o, 'position_x', -360, 360).listen();
-	position_x_control.onChange(function(value) {
-		hyperlapse.position.x = value;
-	});
-
-	var position_y_control = parameters.add(o, 'position_y', -180, 180).listen();
-	position_y_control.onChange(function(value) {
-		hyperlapse.position.y = value;
-	});
-
-	parameters.open();
-	
-	var play_controls = gui.addFolder('play controls');
-	play_controls.add(hyperlapse, 'play');
-	play_controls.add(hyperlapse, 'pause');
-	play_controls.add(hyperlapse, 'next');
-	play_controls.add(hyperlapse, 'prev');
-	play_controls.open();
-
-	window.addEventListener('resize', function(){
-		hyperlapse.setSize(window.innerWidth, window.innerHeight);
-		o.screen_width = window.innerWidth;
-		o.screen_height = window.innerHeight;
-	}, false);
-
-	o.generate();
-
+	generateHyperlapse();
 });
