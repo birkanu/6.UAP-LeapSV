@@ -509,12 +509,14 @@ var Hyperlapse = function(container, params) {
 		if(_forward) {
 			if(++_point_index == _h_points.length) {
 				_point_index = _h_points.length-1;
-				_forward = !_forward;
+				_is_playing = false;
+				// _forward = !_forward;
 			}
 		} else {
 			if(--_point_index == -1) {
 				_point_index = 0;
-				_forward = !_forward;
+				_is_playing = false;
+				// _forward = !_forward;
 			}
 		}
 	};
@@ -583,6 +585,16 @@ var Hyperlapse = function(container, params) {
 	 * @returns {boolean}
 	 */
 	this.isLoading = function() { return _is_loading; };
+
+	/**
+	 * @returns {boolean}
+	 */
+	this.isForward = function() { return _forward; };
+
+	/**
+	 * @param {boolean} isForward
+	 */
+	this.setForward = function(isForward) { _forward = isForward; };
 
 	/**
 	 * @returns {Number}
@@ -765,6 +777,14 @@ var Hyperlapse = function(container, params) {
 		handlePause({});
 	};
 
+	this.hasNext = function() {
+		if(_point_index+1 != _h_points.length) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+
 	/**
 	 * Display next frame in sequence
 	 * @fires Hyperlapse#onFrame
@@ -775,6 +795,15 @@ var Hyperlapse = function(container, params) {
 		if(_point_index+1 != _h_points.length) {
 			_point_index++;
 			drawMaterial();
+		} else {}
+	};
+
+	this.hasPrev = function() {
+		console.log("POINT INDEX = " + _point_index);
+		if(_point_index-1 !== 0 && _point_index-1 > 0) {
+			return true;
+		} else {
+			return false;
 		}
 	};
 

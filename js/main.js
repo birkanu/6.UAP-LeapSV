@@ -158,14 +158,8 @@ $(document).ready(function(){
 		console.log( "Loading: "+ (e.position+1) +" of "+ hyperlapse.length() );
 	};
 
-	// Store frame for motion functions
-	var previousFrame = null;
 	// Setup Leap loop with frame callback function
 	var controllerOptions = {enableGestures: true};
-	// State of moving
-	var is_moving = false;
-	// Direction of moving
-	var moving_forward = true; 
 	// Hand roles
 	var steering_hand;
 	var velocity_hand;
@@ -178,6 +172,7 @@ $(document).ready(function(){
 	hyperlapse.onLoadComplete = function(e) {
 		console.log( "Hyperlapse finished loading route.");
 		hyperlapse.next();
+		// Take the leap loop out of onLoadComplete 
 		Leap.loop(controllerOptions, function(frame) {
   			if (frame.hands.length > 0) {
 			    for (var i = 0; i < frame.hands.length; i++) {
@@ -192,17 +187,20 @@ $(document).ready(function(){
 					}
 					if (velocity_hand == hand.type) {
 						if (frame.hands.length == 1) {
-							hyperlapse.position.x = 0;
-							hyperlapse.position.y = 0;		
+							if (hyperlapse.isForward()) {
+								hyperlapse.position.x = 0;
+							} else {
+								hyperlapse.position.x = 180;
+							}
+							hyperlapse.position.y = 0;
+							previousFrameHasSteeringHand = false;		
 						}
-						if (hand.grabStrength == 1 && is_moving) {
+						if (hand.grabStrength == 1 && hyperlapse.isPlaying() && (hyperlapse.hasPrev() || hyperlapse.hasNext())) {
 							hyperlapse.pause();
-							is_moving = false;
 							console.log("PAUSE. Not driving...");
 						} 
-						if (hand.grabStrength == 0 && !is_moving) {
+						if (hand.grabStrength == 0 && !hyperlapse.isPlaying() && (hyperlapse.hasPrev() || hyperlapse.hasNext())) {
 							hyperlapse.play();
-							is_moving = true;
 							console.log("PLAY. Driving...");
 						}
 						leap_palmPosition_y = hand.palmPosition[1];
@@ -230,17 +228,31 @@ $(document).ready(function(){
 						hyperlapse.position.x = hyperlapse_x;
 						hyperlapse.position.y = hyperlapse_y;
 						previousFrameHasSteeringHand = true;
+						if (hyperlapse.isForward() && !hyperlapse.isPlaying() && (Math.abs(hyperlapse.position.x) > 100 || Math.abs(hyperlapse.position.x).x < 270)) {
+							hyperlapse.setForward(false);
+							console.log("Direction is set to be BACKWARDS.");
+							if (!hyperlapse.hasNext()) {
+								hyperlapse.play();
+								continue;
+							}
+						} else if (!hyperlapse.isForward() && !hyperlapse.isPlaying() && (Math.abs(hyperlapse.position.x) < 100 || Math.abs(hyperlapse.position.x) > 270)) {
+							hyperlapse.setForward(true);
+							console.log("Direction is set to be FORWARDS.");
+							if (!hyperlapse.hasPrev()) {
+								hyperlapse.play();
+								continue;
+							}
+						}
 					} 	
-					if ((frame.hands.length == 1) && (hand.type != steering_hand)) {
-						previousFrameHasSteeringHand = false;
-					}
 			    }
 			} else {
-				hyperlapse.position.x = 0;
+				if (hyperlapse.isForward()) {
+					hyperlapse.position.x = 0;
+				} else {
+					hyperlapse.position.x = 180;
+				}
 				hyperlapse.position.y = 0;	
 			}
-  			// Store frame for motion functions
-  			previousFrame = frame;
 		});
 	};
 
