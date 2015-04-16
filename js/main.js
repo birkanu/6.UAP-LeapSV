@@ -195,11 +195,11 @@ $(document).ready(function(){
 							hyperlapse.position.y = 0;
 							previousFrameHasSteeringHand = false;		
 						}
-						if (hand.grabStrength == 1 && hyperlapse.isPlaying() && (hyperlapse.hasPrev() || hyperlapse.hasNext())) {
+						if (hand.grabStrength == 1 && hyperlapse.isPlaying() && ((hyperlapse.hasPrev() && !hyperlapse.isForward()) || (hyperlapse.hasNext() && hyperlapse.isForward()))) {
 							hyperlapse.pause();
 							console.log("PAUSE. Not driving...");
 						} 
-						if (hand.grabStrength == 0 && !hyperlapse.isPlaying() && (hyperlapse.hasPrev() || hyperlapse.hasNext())) {
+						if (hand.grabStrength == 0 && !hyperlapse.isPlaying() && ((hyperlapse.hasPrev() && !hyperlapse.isForward()) || (hyperlapse.hasNext() && hyperlapse.isForward()))) {
 							hyperlapse.play();
 							console.log("PLAY. Driving...");
 						}
@@ -208,6 +208,21 @@ $(document).ready(function(){
 						hyperlapse.millis = hyperlapse_millis;
 					}  						
 					if (steering_hand == hand.type) {
+						if (hyperlapse.isForward() && !hyperlapse.isPlaying() && (Math.abs(hyperlapse.position.x) > 100 || Math.abs(hyperlapse.position.x).x < 270)) {
+							hyperlapse.setForward(false);
+							console.log("Direction is set to be BACKWARDS.");
+							if (!hyperlapse.hasNext()) {
+								hyperlapse.play();
+								continue;
+							}
+						} else if (!hyperlapse.isForward() && !hyperlapse.isPlaying() && (Math.abs(hyperlapse.position.x) < 100 || Math.abs(hyperlapse.position.x) > 270)) {
+							hyperlapse.setForward(true);
+							console.log("Direction is set to be FORWARDS.");
+							if (!hyperlapse.hasPrev()) {
+								hyperlapse.play();
+								continue;
+							}
+						}
 						var leap_pitch = null;
 						var leap_yaw = null;
 						if (previousFrameHasSteeringHand) {
@@ -228,21 +243,6 @@ $(document).ready(function(){
 						hyperlapse.position.x = hyperlapse_x;
 						hyperlapse.position.y = hyperlapse_y;
 						previousFrameHasSteeringHand = true;
-						if (hyperlapse.isForward() && !hyperlapse.isPlaying() && (Math.abs(hyperlapse.position.x) > 100 || Math.abs(hyperlapse.position.x).x < 270)) {
-							hyperlapse.setForward(false);
-							console.log("Direction is set to be BACKWARDS.");
-							if (!hyperlapse.hasNext()) {
-								hyperlapse.play();
-								continue;
-							}
-						} else if (!hyperlapse.isForward() && !hyperlapse.isPlaying() && (Math.abs(hyperlapse.position.x) < 100 || Math.abs(hyperlapse.position.x) > 270)) {
-							hyperlapse.setForward(true);
-							console.log("Direction is set to be FORWARDS.");
-							if (!hyperlapse.hasPrev()) {
-								hyperlapse.play();
-								continue;
-							}
-						}
 					} 	
 			    }
 			} else {

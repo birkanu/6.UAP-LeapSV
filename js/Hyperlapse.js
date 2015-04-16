@@ -799,7 +799,6 @@ var Hyperlapse = function(container, params) {
 	};
 
 	this.hasPrev = function() {
-		console.log("POINT INDEX = " + _point_index);
 		if(_point_index-1 !== 0 && _point_index-1 > 0) {
 			return true;
 		} else {
