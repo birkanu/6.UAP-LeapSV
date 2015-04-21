@@ -510,13 +510,13 @@ var Hyperlapse = function(container, params) {
 			if(++_point_index == _h_points.length) {
 				_point_index = _h_points.length-1;
 				_is_playing = false;
-				// _forward = !_forward;
+				$("#message").html("You reached the end location. To drive back to your start location, <b>rotate</b> your <b>left hand</b> to <b>look backward</b>.");
 			}
 		} else {
 			if(--_point_index == -1) {
 				_point_index = 0;
 				_is_playing = false;
-				// _forward = !_forward;
+				$("#message").html("You reached the start location. To drive back to your end location, <b>rotate</b> your <b>left hand</b> to <b>look forward</b>.");
 			}
 		}
 	};
@@ -774,6 +774,7 @@ var Hyperlapse = function(container, params) {
 	 */
 	this.pause = function() {
 		_is_playing = false;
+		$("#speedValue").text("0");
 		handlePause({});
 	};
 
