@@ -46,6 +46,8 @@ $(document).ready(function(){
   		return radians * (180 / Math.PI);
 	}
 
+	var bounds;
+
 	function generateHyperlapse() {
 		console.log( "Generating route..." );
 		var marker;
@@ -60,7 +62,7 @@ $(document).ready(function(){
 		};
 		directions_service.route(request, function(response, status) {
 			if (status == google.maps.DirectionsStatus.OK) {
-		        var bounds = response.routes[0].bounds;
+		       	bounds = response.routes[0].bounds;
 		        map.fitBounds(bounds);
 		        map.setCenter(bounds.getCenter()); 
 		        directions_renderer.setDirections(response);  
@@ -171,6 +173,14 @@ $(document).ready(function(){
 
 	hyperlapse.onLoadComplete = function(e) {
 		console.log( "Hyperlapse finished loading route.");
+		$(".loading-message").hide();
+		$(".loading-container").hide();
+		$("#pano").show();
+		$("#map").show();
+		// Resize map after showing (cause Google Maps is weird)
+		google.maps.event.trigger(map, 'resize');
+		map.fitBounds(bounds);
+		map.setCenter(bounds.getCenter()); 
 		hyperlapse.next();
 		// Take the leap loop out of onLoadComplete 
 		Leap.loop(controllerOptions, function(frame) {

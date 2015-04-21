@@ -21,11 +21,22 @@
 </head> 
 
 <body> 
-
-	<div id="pano"></div>
-	<div id="controls">
-		<div id="map"></div>
-	</div>	
+	<div aria-busy="true" aria-label="Loading" role="progressbar" class="loading-container">
+	  	<div class="swing">
+		    <div class="swing-l"></div>
+		    <div></div>
+		    <div></div>
+		    <div></div>
+		    <div></div>
+		    <div></div>
+		    <div class="swing-r"></div>
+	  	</div>
+	</div>
+  	<div class="loading-message">
+		<p>Loading the Hyperlapse Video for your route...</p>
+	</div>
+	<div id="pano" style="display:none;"></div>
+	<div id="map" style="display:none;"></div>
 
 </body> 
 
