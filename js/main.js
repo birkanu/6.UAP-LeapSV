@@ -239,8 +239,13 @@ $(document).ready(function(){
 					hyperlapse_millis = scale(leap_palmPosition_y, 20, 500, 10, 250);
 					hyperlapse.millis = hyperlapse_millis;
 					var speed = scale(hyperlapse_millis, 10, 250, 200, 0);
+					speed = Math.round(speed);
 					if (hyperlapse.isPlaying()) {
-						$("#speedValue").text(Math.round(speed));
+						if (speed < 0) {
+							$("#speedValue").text(0);
+						} else {
+							$("#speedValue").text(speed);
+						}
 					}
 				}  						
 				if (steering_hand == hand.type) {
