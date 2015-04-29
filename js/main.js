@@ -134,7 +134,7 @@ $(document).ready(function(){
 	var hyperlapse = new Hyperlapse(pano, {
 		lookat: lookat_point,
 		fov: 80,
-		millis: 90,
+		millis: 150,
 		width: window.innerWidth,
 		height: window.innerHeight,
 		zoom: 2,
@@ -235,10 +235,10 @@ $(document).ready(function(){
 						hyperlapse.play();
 						$("#message").html("You are driving. Make a <b>right hand fist</b> gesture to stop.");
 					}
-					leap_palmPosition_y = hand.palmPosition[1];
-					hyperlapse_millis = scale(leap_palmPosition_y, 20, 500, 10, 250);
+					leap_palmPosition_y = hand.stabilizedPalmPosition[1];
+					hyperlapse_millis = scale(leap_palmPosition_y, 20, 500, 75, 250);
 					hyperlapse.millis = hyperlapse_millis;
-					var speed = scale(hyperlapse_millis, 10, 250, 200, 0);
+					var speed = scale(hyperlapse_millis, 75, 250, 150, 0);
 					speed = Math.round(speed);
 					if (hyperlapse.isPlaying()) {
 						if (speed < 0) {
